@@ -1,4 +1,4 @@
-# Feature request — paste into apache/airflow `2-feature_request.yml`
+# Feature request — FILED at https://github.com/apache/airflow/issues/68845
 
 **Title:** Add SandboxExecutor: run each task in an ephemeral cloud sandbox (Daytona/E2B/Modal/islo)
 

@@ -3,6 +3,16 @@
 The sanctioned sequence (per `providers/ACCEPTING_PROVIDERS.rst`, AIP-51, and
 `contributing-docs/05_pull_requests.rst`). **Do not open a cold PR.**
 
+## Current status
+
+- ✅ Working reference implementation (this repo).
+- ✅ Feature-request issue filed: https://github.com/apache/airflow/issues/68845
+- ✅ PR-ready, monorepo-shaped branch staged as a draft on the fork:
+  https://github.com/zozo123/airflow/pull/1 (base `zozo123:main`; retarget to
+  `apache:main` only after the steps below).
+- ⏳ Next (human-driven): `[DISCUSS]` email to dev@airflow, secure ≥2 stewards +
+  1 committer sponsor, clear the 7-day lazy-consensus window.
+
 ## Go / no-go
 
 - **AIP required?** No. AIP-51 made `BaseExecutor` the public, stable executor
