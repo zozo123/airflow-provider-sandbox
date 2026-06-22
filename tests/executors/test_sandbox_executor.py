@@ -15,7 +15,7 @@ from airflow_provider_sandbox.executors.sandbox_executor import (  # noqa: E402
     SandboxWatcher,
     _GONE_AFTER_CONSECUTIVE_UNKNOWN,
 )
-from airflow_provider_sandbox.providers.base import ExecResult, SandboxState  # noqa: E402
+from airflow_provider_sandbox.backends.base import ExecResult, SandboxState  # noqa: E402
 
 
 class _FlakyProvider:

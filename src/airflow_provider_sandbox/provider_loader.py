@@ -8,14 +8,14 @@ from __future__ import annotations
 
 from importlib import import_module
 
-from airflow_provider_sandbox.providers.base import SandboxProvider
+from airflow_provider_sandbox.backends.base import SandboxProvider
 
 _BUILTIN: dict[str, str] = {
-    "local": "airflow_provider_sandbox.providers.local:LocalProvider",
-    "daytona": "airflow_provider_sandbox.providers.daytona:DaytonaProvider",
-    "e2b": "airflow_provider_sandbox.providers.e2b:E2BProvider",
-    "modal": "airflow_provider_sandbox.providers.modal:ModalProvider",
-    "islo": "airflow_provider_sandbox.providers.islo:IsloProvider",
+    "local": "airflow_provider_sandbox.backends.local:LocalProvider",
+    "daytona": "airflow_provider_sandbox.backends.daytona:DaytonaProvider",
+    "e2b": "airflow_provider_sandbox.backends.e2b:E2BProvider",
+    "modal": "airflow_provider_sandbox.backends.modal:ModalProvider",
+    "islo": "airflow_provider_sandbox.backends.islo:IsloProvider",
 }
 
 

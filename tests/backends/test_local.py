@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import time
 
-from airflow_provider_sandbox.providers.base import SandboxSpec, SandboxState
-from airflow_provider_sandbox.providers.local import LocalProvider
+from airflow_provider_sandbox.backends.base import SandboxSpec, SandboxState
+from airflow_provider_sandbox.backends.local import LocalProvider
 
 
 def _run_to_terminal(provider, handle, exec_ref, timeout=30):

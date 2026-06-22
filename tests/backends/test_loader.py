@@ -3,8 +3,8 @@ from __future__ import annotations
 import pytest
 
 from airflow_provider_sandbox.provider_loader import load_provider
-from airflow_provider_sandbox.providers.base import SandboxProvider
-from airflow_provider_sandbox.providers.local import LocalProvider
+from airflow_provider_sandbox.backends.base import SandboxProvider
+from airflow_provider_sandbox.backends.local import LocalProvider
 
 
 def test_loads_builtin_alias():
@@ -14,7 +14,7 @@ def test_loads_builtin_alias():
 
 
 def test_loads_by_fqcn():
-    provider = load_provider("airflow_provider_sandbox.providers.local:LocalProvider")
+    provider = load_provider("airflow_provider_sandbox.backends.local:LocalProvider")
     assert isinstance(provider, LocalProvider)
 
 

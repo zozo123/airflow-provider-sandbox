@@ -20,7 +20,7 @@ from airflow.configuration import conf
 from airflow.executors.base_executor import BaseExecutor
 
 from airflow_provider_sandbox.provider_loader import load_provider
-from airflow_provider_sandbox.providers.base import (
+from airflow_provider_sandbox.backends.base import (
     ExecResult,
     SandboxProvider,
     SandboxSpec,

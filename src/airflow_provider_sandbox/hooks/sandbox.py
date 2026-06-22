@@ -11,7 +11,7 @@ from typing import Any
 from airflow.hooks.base import BaseHook
 
 from airflow_provider_sandbox.provider_loader import load_provider
-from airflow_provider_sandbox.providers.base import SandboxProvider
+from airflow_provider_sandbox.backends.base import SandboxProvider
 
 
 class SandboxHook(BaseHook):

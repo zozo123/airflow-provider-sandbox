@@ -1,4 +1,4 @@
-from airflow_provider_sandbox.providers.base import (
+from airflow_provider_sandbox.backends.base import (
     ExecResult,
     SandboxCapabilities,
     SandboxProvider,

@@ -21,7 +21,7 @@ import time
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from airflow_provider_sandbox.provider_loader import load_provider  # noqa: E402
-from airflow_provider_sandbox.providers.base import (  # noqa: E402
+from airflow_provider_sandbox.backends.base import (  # noqa: E402
     SandboxSpec,
     SandboxState,
 )

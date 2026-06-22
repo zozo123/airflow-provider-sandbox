@@ -21,6 +21,12 @@ def get_provider_info() -> dict:
         "executors": [
             "airflow_provider_sandbox.executors.sandbox_executor.SandboxExecutor",
         ],
+        "task-decorators": [
+            {
+                "name": "sandbox",
+                "class-name": "airflow_provider_sandbox.decorators.sandbox.sandbox_task",
+            },
+        ],
         "config": {
             "sandbox": {
                 "description": "SandboxExecutor configuration.",

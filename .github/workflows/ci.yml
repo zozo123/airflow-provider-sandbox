@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Ruff
+        run: uvx ruff check src tests examples
+
+  demo:
+    # The provider contract + local backend run with no Airflow and no creds.
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv venv --python ${{ matrix.python-version }}
+      - run: uv pip install pytest
+      - name: Backend + loader tests (no Airflow)
+        run: uv run pytest -q tests/backends
+      - name: Runnable demo (local backend)
+        run: uv run python examples/demo.py
+
+  test-with-airflow:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv venv --python ${{ matrix.python-version }}
+      - name: Install package + Airflow
+        run: uv pip install -e ".[dev]" "apache-airflow[standard]>=3.0,<3.2"
+      - name: Full test suite (executor + operator + decorator)
+        run: uv run pytest -q

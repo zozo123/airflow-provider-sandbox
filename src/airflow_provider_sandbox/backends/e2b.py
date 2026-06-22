@@ -6,7 +6,7 @@ was persisted before a crash). Requires ``E2B_API_KEY``.
 
 from __future__ import annotations
 
-from airflow_provider_sandbox.providers.base import (
+from airflow_provider_sandbox.backends.base import (
     ExecResult,
     SandboxCapabilities,
     SandboxProvider,
@@ -39,7 +39,14 @@ class E2BProvider(SandboxProvider):
     def create_sandbox(self, spec: SandboxSpec) -> str:
         from e2b import Sandbox
 
-        sandbox = Sandbox(template=spec.image or "base", timeout=spec.timeout, metadata=spec.labels)
+        # e2b's current API is the Sandbox.create() classmethod (verified against
+        # the installed SDK); the bare constructor is legacy.
+        kwargs: dict = {"timeout": spec.timeout}
+        if spec.image:
+            kwargs["template"] = spec.image
+        if spec.labels:
+            kwargs["metadata"] = spec.labels
+        sandbox = Sandbox.create(**kwargs)
         handle = sandbox.sandbox_id
         self._sandboxes[handle] = sandbox
         return handle

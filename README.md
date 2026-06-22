@@ -44,6 +44,43 @@ SANDBOX_PROVIDER=daytona python examples/demo.py   # needs DAYTONA_API_KEY
 It drives the exact lifecycle the executor uses
 (`create → upload → run → poll → logs → destroy`) and prints each step.
 
+## Two ways to use it
+
+### 1. `SandboxOperator` / `@task.sandbox` — run *one* task in a sandbox (recommended start)
+
+No special executor needed — a normal task runs a command in a sandbox. This is
+the incremental, low-risk way to adopt sandboxes (the KubernetesPodOperator
+pattern). Verified end-to-end against Airflow 3 via `dag.test()`.
+
+```python
+from airflow.decorators import task
+from airflow_provider_sandbox.operators.sandbox import SandboxOperator
+
+# Operator form
+SandboxOperator(
+    task_id="build",
+    provider="daytona",
+    image="python:3.12-slim",
+    command="pip install -r req.txt && pytest",
+)
+
+# TaskFlow form (mirrors @task.bash: return the command to run in the sandbox)
+@task.sandbox(provider="e2b", env={"ANTHROPIC_API_KEY": "{{ var.value.anthropic_api_key }}"})
+def run_agent() -> str:
+    return "python /opt/agent.py"   # runs in an isolated sandbox; creds injected only there
+```
+
+#### Killer use case: run an LLM agent in an isolated sandbox
+
+LLM agents execute *model-generated* code — exactly what you don't want on a
+shared worker. Inject the model key into the sandbox only (resolved from an
+Airflow Variable/Connection), give the agent a fresh disposable environment, and
+keep the blast radius at one task. See [`examples/agent_in_sandbox_dag.py`](examples/agent_in_sandbox_dag.py).
+This composes with an agent toolset — a future `@task.agent` / `AgentOperator`
+can hand the sandbox an `AgentSkillsToolset` plus the injected credentials.
+
+### 2. `SandboxExecutor` — route *every* task through a sandbox
+
 ## Configure
 
 ```ini
@@ -77,15 +114,18 @@ BashOperator(
 
 ## Providers & capabilities
 
-| Provider | `kind` | file upload | async exec | kill | reattach (adopt) |
-|----------|--------|:-----------:|:----------:|:----:|:----------------:|
-| `local`  | delegated-run | ✅ | ✅ | ✅ | ❌ |
-| `daytona`| delegated-run | ✅ | ✅ | ✅ | ✅ (labelled) |
-| `e2b`    | delegated-run | ✅ | ✅ | ✅ | ❌ (opaque handle) |
-| `modal`  | delegated-run | ❌ (image-baked) | ✅ | ✅ | ❌ |
-| `islo`   | delegated-run | ✅ | ✅ | ❌ | ✅ (named) |
+| Provider | `kind` | file upload | async exec | kill | reattach (adopt) | SDK |
+|----------|--------|:-----------:|:----------:|:----:|:----------------:|-----|
+| `local`  | delegated-run | ✅ | ✅ | ✅ | ❌ | none (subprocess) |
+| `daytona`| delegated-run | ✅ | ✅ | ✅ | ✅ (labelled) | `daytona` |
+| `e2b`    | delegated-run | ✅ | ✅ | ✅ | ❌ (opaque handle) | `e2b` |
+| `modal`  | delegated-run | ❌ (image-baked) | ✅ | ✅ | ❌ | `modal` |
+| `islo`   | delegated-run | ❌ (image/git) | ✅ | ❌ | ✅ (named) | `islo` |
 
-Add your own backend by subclassing `SandboxProvider` and pointing
+Every SaaS backend's call sites are checked against the real SDKs by
+[`scripts/verify_sdk_conformance.py`](scripts/verify_sdk_conformance.py)
+(49/49 passing for daytona/e2b/modal/islo). islo additionally supports
+pause/resume. Add your own backend by subclassing `SandboxProvider` and pointing
 `[sandbox] provider` at `your_module:YourProvider`.
 
 ## Design notes & honest limitations
@@ -102,12 +142,17 @@ Add your own backend by subclassing `SandboxProvider` and pointing
   for opaque-handle providers (E2B, Modal) — a scheduler crash can strand a
   sandbox.
 
-## Status & upstreaming
+## Status
 
-Alpha. This is a standalone third-party provider, the sanctioned first step for
-a new Airflow executor (see [`docs/UPSTREAMING.md`](docs/UPSTREAMING.md)). It is
-**not** an `apache/airflow` monorepo package — the `apache-airflow-providers-*`
-name is ASF-reserved.
+Alpha, but **proven end-to-end**: `SandboxOperator` and `@task.sandbox` both run
+real Airflow 3 tasks inside a sandbox (verified with `dag.test()` on the `local`
+backend, including credential injection), all four SaaS backends pass SDK
+conformance, and 17 unit tests pass.
+
+This is a standalone third-party provider — the sanctioned first step for a new
+Airflow executor (see [`docs/UPSTREAMING.md`](docs/UPSTREAMING.md)). It is
+**not** an `apache/airflow` monorepo package; the `apache-airflow-providers-*`
+name is ASF-reserved. Tracking issue: apache/airflow#68845.
 
 ## License
 
