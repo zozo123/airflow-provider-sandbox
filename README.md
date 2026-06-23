@@ -144,10 +144,20 @@ pause/resume. Add your own backend by subclassing `SandboxProvider` and pointing
 
 ## Status
 
-Alpha, but **proven end-to-end**: `SandboxOperator` and `@task.sandbox` both run
-real Airflow 3 tasks inside a sandbox (verified with `dag.test()` on the `local`
-backend, including credential injection), all four SaaS backends pass SDK
-conformance, and 17 unit tests pass.
+Alpha, but **proven end-to-end and reproducible**: `SandboxOperator` and
+`@task.sandbox` both run real Airflow 3 tasks inside a sandbox, including
+credential injection. Reproduce it from a clean checkout with
+`examples/sandbox_e2e_proof_dag.py`:
+
+```bash
+export AIRFLOW_HOME=/tmp/sbx AIRFLOW__CORE__DAGS_FOLDER=$(pwd)/examples AIRFLOW__CORE__LOAD_EXAMPLES=False
+airflow db migrate && airflow dags test sandbox_e2e_proof   # -> state=success, AGENT_RESULT=ok
+```
+
+SaaS backend call sites are verified against the real SDKs by
+`scripts/verify_sdk_conformance.py` (49/49 — **requires** `pip install daytona
+e2b modal islo`; it reports "nothing verified" if they are absent). 17 unit
+tests pass.
 
 This is a standalone third-party provider — the sanctioned first step for a new
 Airflow executor (see [`docs/UPSTREAMING.md`](docs/UPSTREAMING.md)). It is

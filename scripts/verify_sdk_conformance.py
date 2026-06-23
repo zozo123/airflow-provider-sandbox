@@ -105,7 +105,8 @@ def check_islo() -> None:
 def main() -> int:
     for fn in (check_daytona, check_e2b, check_modal, check_islo):
         fn()
-    print(f"PASS {len(ok)} / {len(ok) + len(bad)} SDK conformance checks")
+    total = len(ok) + len(bad)
+    print(f"PASS {len(ok)} / {total} SDK conformance checks")
     if skipped:
         print("skipped (SDK not installed):", ", ".join(skipped))
     if bad:
@@ -113,6 +114,14 @@ def main() -> int:
         for b in bad:
             print("  x", b)
         return 1
+    if total == 0:
+        # No SDKs installed → nothing was actually verified. Do NOT report a
+        # vacuous "OK" (this previously read as a pass when it verified nothing).
+        print(
+            "NOTHING VERIFIED: install the SaaS SDKs to run real conformance — "
+            "pip install daytona e2b modal islo"
+        )
+        return 2
     print("OK: all checked call sites match the installed SDKs")
     return 0
 
