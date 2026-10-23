@@ -1,7 +1,8 @@
 # airflow-provider-sandbox
 
-> Run each Apache Airflow task instance in an **ephemeral cloud sandbox** —
-> behind a pluggable provider layer (local · Daytona · E2B · Modal · islo).
+> Alpha, third-party Apache Airflow provider that runs each task instance in an
+> **ephemeral sandbox** behind a pluggable provider layer
+> (local · Daytona · E2B · Modal · islo).
 
 `SandboxExecutor` does for ephemeral sandboxes what `KubernetesExecutor` does
 for pods: every queued task leases a fresh, isolated sandbox, runs the task
@@ -29,9 +30,9 @@ Scheduler ──workload──▶ SandboxExecutor ──▶ SandboxProvider ─�
 ## Install
 
 ```bash
-pip install airflow-provider-sandbox            # local backend only
-pip install 'airflow-provider-sandbox[daytona]' # + Daytona SDK
-pip install 'airflow-provider-sandbox[e2b]'     # + E2B, [modal], [islo]
+# Not yet on PyPI; install from GitHub
+pip install "airflow-provider-sandbox @ git+https://github.com/zozo123/airflow-provider-sandbox"
+pip install "airflow-provider-sandbox[daytona] @ git+https://github.com/zozo123/airflow-provider-sandbox"  # also [e2b], [modal], [islo]
 ```
 
 ## Quickstart — 20-second demo, no credentials
@@ -70,18 +71,19 @@ def run_agent() -> str:
     return "python /opt/agent.py"   # runs in an isolated sandbox; creds injected only there
 ```
 
-#### Killer use case: run an LLM agent in an isolated sandbox
+#### Example: run an LLM agent in an isolated sandbox
 
 LLM agents execute *model-generated* code — exactly what you don't want on a
 shared worker. Inject the model key into the sandbox only (resolved from an
 Airflow Variable/Connection), give the agent a fresh disposable environment, and
 keep the blast radius at one task. See [`examples/agent_in_sandbox_dag.py`](examples/agent_in_sandbox_dag.py).
-This composes with an agent toolset — a future `@task.agent` / `AgentOperator`
-can hand the sandbox an `AgentSkillsToolset` plus the injected credentials.
 
 ### 2. `SandboxExecutor` — route *every* task through a sandbox
 
-## Configure
+Set the executor in airflow.cfg. Every task, or every task with
+`executor="sandbox"`, then runs in a fresh sandbox.
+
+#### Configure
 
 ```ini
 [core]
@@ -144,10 +146,9 @@ pause/resume. Add your own backend by subclassing `SandboxProvider` and pointing
 
 ## Status
 
-Alpha, but **proven end-to-end and reproducible**: `SandboxOperator` and
-`@task.sandbox` both run real Airflow 3 tasks inside a sandbox, including
-credential injection. Reproduce it from a clean checkout with
-`examples/sandbox_e2e_proof_dag.py`:
+Alpha. In a manual end-to-end run, `SandboxOperator` and `@task.sandbox` both
+ran real Airflow 3 tasks inside a sandbox, including credential injection.
+Reproduce it from a clean checkout with `examples/sandbox_e2e_proof_dag.py`:
 
 ```bash
 export AIRFLOW_HOME=/tmp/sbx AIRFLOW__CORE__DAGS_FOLDER=$(pwd)/examples AIRFLOW__CORE__LOAD_EXAMPLES=False
@@ -156,13 +157,14 @@ airflow db migrate && airflow dags test sandbox_e2e_proof   # -> state=success, 
 
 SaaS backend call sites are verified against the real SDKs by
 `scripts/verify_sdk_conformance.py` (49/49 — **requires** `pip install daytona
-e2b modal islo`; it reports "nothing verified" if they are absent). 17 unit
-tests pass.
+e2b modal islo`; it reports "nothing verified" if they are absent).
+
+Unit tests: `pytest -q` (see CI).
 
 This is a standalone third-party provider — the sanctioned first step for a new
 Airflow executor (see [`docs/UPSTREAMING.md`](docs/UPSTREAMING.md)). It is
 **not** an `apache/airflow` monorepo package; the `apache-airflow-providers-*`
-name is ASF-reserved. Tracking issue: apache/airflow#68845.
+name is ASF-reserved. Tracking issue: [apache/airflow#68845](https://github.com/apache/airflow/issues/68845).
 
 ## License
 

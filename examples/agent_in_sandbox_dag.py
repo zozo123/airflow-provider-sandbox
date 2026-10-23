@@ -1,6 +1,6 @@
 """The marquee use case: run an LLM agent inside an ephemeral, isolated sandbox.
 
-Why this is the killer app for a sandbox executor/operator:
+Why this fits a sandbox executor/operator:
   * LLM agents run *model-generated* code/tool-calls — you do not want that
     executing on a shared Airflow worker with broad credentials and network.
   * A fresh, disposable sandbox per run gives strong isolation, a clean
@@ -9,10 +9,10 @@ Why this is the killer app for a sandbox executor/operator:
     from an Airflow Variable/Connection) and never touches the worker's
     environment or logs.
 
-This pattern composes naturally with an agent toolset: the command launched in
-the sandbox can be an agent runner that loads tools/"skills" and calls the model
-(e.g. a future ``@task.agent`` / ``AgentOperator`` that hands the sandbox an
-``AgentSkillsToolset`` and the injected model credentials).
+Idea, not implemented: the command launched in the sandbox could be an agent
+runner that loads tools/"skills" and calls the model, e.g. a future
+``@task.agent`` / ``AgentOperator`` that hands the sandbox an agent toolset and
+the injected model credentials. Neither exists in this package.
 """
 
 from __future__ import annotations

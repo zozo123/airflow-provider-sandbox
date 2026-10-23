@@ -23,7 +23,7 @@ reconciles terminal exit state via a polling watcher.
 
 Working reference implementation (runs end-to-end on the local backend, unit
 tests included): https://github.com/zozo123/airflow-provider-sandbox
-Tracking issue: <link>
+Tracking issue: https://github.com/apache/airflow/issues/68845
 
 Two questions for the list:
 
@@ -41,4 +41,4 @@ Disclosure: the implementation was developed with assistance from Claude
 it.
 
 Thanks,
-zozo123
+Yossi Eliaz

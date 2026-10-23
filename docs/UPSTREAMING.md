@@ -7,9 +7,9 @@ The sanctioned sequence (per `providers/ACCEPTING_PROVIDERS.rst`, AIP-51, and
 
 - ✅ Working reference implementation (this repo).
 - ✅ Feature-request issue filed: https://github.com/apache/airflow/issues/68845
-- ✅ PR-ready, monorepo-shaped branch staged as a draft on the fork:
-  https://github.com/zozo123/airflow/pull/1 (base `zozo123:main`; retarget to
-  `apache:main` only after the steps below).
+- ✅ Monorepo-shaped branch prepared on the fork
+  ([zozo123/airflow#1](https://github.com/zozo123/airflow/pull/1), closed); not
+  submitted upstream.
 - ⏳ Next (human-driven): `[DISCUSS]` email to dev@airflow, secure ≥2 stewards +
   1 committer sponsor, clear the 7-day lazy-consensus window.
 
