@@ -80,8 +80,9 @@ keep the blast radius at one task. See [`examples/agent_in_sandbox_dag.py`](exam
 
 ### 2. `SandboxExecutor` — route *every* task through a sandbox
 
-Set the executor in airflow.cfg. Every task, or every task with
-`executor="sandbox"`, then runs in a fresh sandbox.
+Set the executor in `airflow.cfg`. As the only executor, it runs every task in
+a fresh sandbox; added under an alias next to another executor, it runs only
+the tasks that set `executor="sandbox"`.
 
 #### Configure
 
